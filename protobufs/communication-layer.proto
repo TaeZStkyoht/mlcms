@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package cl;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message MessageRequest {
+	enum Priority {
+		NONE = 0;
+		LOW = 1;
+		NORMAL = 2;
+		HIGH = 3;
+		CRITICAL = 4;
+	}
+
+	Priority priority = 1;
+	uint32 sender_id = 2;
+	google.protobuf.Timestamp timestamp = 3;
+	bytes payload = 4;
+}
+
+service CommunicationLayer {
+	rpc SendMessage(stream MessageRequest) returns (google.protobuf.Empty) {}
+}

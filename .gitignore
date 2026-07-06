@@ -1,0 +1,9 @@
+*.sw?
+build/
+arm_build/
+.idea/
+cmake-build-debug/
+cmake-build-debug-docker/
+.vscode
+test/next-daily-time
+.project
