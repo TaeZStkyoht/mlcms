@@ -2,13 +2,14 @@
 
 #include "entity/PriorityCredit.hpp"
 
+#include "interface/MessageRequestObserver.hpp"
 #include "interface/MessageRequestPuller.hpp"
 #include "interface/MessageRequestPusher.hpp"
 
 #include <mutex>
 #include <queue>
 
-class MessageRequestHolder final : public MessageRequestPusher, public MessageRequestPuller {
+class MessageRequestHolder final : public MessageRequestObserver, public MessageRequestPusher, public MessageRequestPuller {
 public:
 	explicit constexpr MessageRequestHolder(entity::PriorityCredit priorityCredit) noexcept
 		: _priorityCreditDefault(priorityCredit), _priorityCredit(_priorityCreditDefault)
@@ -16,6 +17,7 @@ public:
 	}
 
 private:
+	QueueSize Size() const override;
 	void Push(entity::MessageRequest messageRequest) override;
 	std::optional<entity::MessageRequest> Pull() override;
 
@@ -26,5 +28,5 @@ private:
 	std::queue<entity::MessageRequest> _messageRequestsHigh;
 	std::queue<entity::MessageRequest> _messageRequestsNormal;
 	std::queue<entity::MessageRequest> _messageRequestsLow;
-	std::mutex _mtx;
+	mutable std::mutex _mtx;
 };

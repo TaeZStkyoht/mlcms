@@ -1,18 +1,18 @@
-add_protobuf(communication-layer)
+add_library(${PROJECT_NAME}-MessageRequestHolder OBJECT MessageRequestHolder.cpp)
+add_library(${PROJECT_NAME}-GrpcServer OBJECT GrpcServer.cpp)
+add_library(${PROJECT_NAME}-MessageRequestSender OBJECT MessageRequestSender.cpp)
+add_library(${PROJECT_NAME}-Observer OBJECT Observer.cpp)
+add_library(${PROJECT_NAME}-Core OBJECT Core.cpp)
 
-add_library(MessageRequestHolder OBJECT MessageRequestHolder.cpp)
-add_library(GrpcServer OBJECT GrpcServer.cpp)
-add_library(MessageRequestSender OBJECT MessageRequestSender.cpp)
-add_library(Core OBJECT Core.cpp)
-
-add_dependencies(GrpcServer communication-layer-proto)
+add_dependencies(${PROJECT_NAME}-GrpcServer communication-layer-proto)
 
 add_executable(${PROJECT_NAME} main.cpp
-	$<TARGET_OBJECTS:Core>
-	$<TARGET_OBJECTS:MessageRequestSender>
-	$<TARGET_OBJECTS:GrpcServer>
+	$<TARGET_OBJECTS:${PROJECT_NAME}-Core>
+	$<TARGET_OBJECTS:${PROJECT_NAME}-Observer>
+	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestSender>
+	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcServer>
+	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestHolder>
 	$<TARGET_OBJECTS:BaseGrpcServer>
-	$<TARGET_OBJECTS:MessageRequestHolder>
 	$<TARGET_OBJECTS:Logger>
 	$<TARGET_OBJECTS:communication-layer-proto>
 )

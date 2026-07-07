@@ -18,6 +18,8 @@ using namespace middleware;
 
 using enum Logger::Level;
 
+extern const atomic_bool run;
+
 static const Logger logger = Logger::getLoggerByCategory("GrpcServer");
 
 class GrpcServer::Impl final : public cl::CommunicationLayer::Service, public BaseGrpcServer {
@@ -32,7 +34,7 @@ private:
 	{
 		logger << DEBUG << "Client (" << context << ") connected and allowed to stream";
 
-		while (!context->IsCancelled()) {
+		while (run && !context->IsCancelled()) {
 			if (cl::MessageRequest messageRequest; reader->Read(&messageRequest)) {
 				_messageRequestPusher->Push({
 					.priority = static_cast<entity::MessageRequest::Priority>(messageRequest.priority()),

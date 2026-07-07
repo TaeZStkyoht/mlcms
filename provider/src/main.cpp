@@ -4,6 +4,8 @@
 
 #include <csignal>
 
+#include <thread>
+
 using namespace std;
 using namespace chrono;
 
@@ -15,7 +17,7 @@ static const Logger logger = Logger::getLoggerByCategory("main");
 
 atomic_bool run = true;
 
-int main(int argc, const char* argv[])
+int main()
 {
 	const auto signalHandler = [](int) {
 		logger << INFO << "signal caught!";
@@ -27,7 +29,7 @@ int main(int argc, const char* argv[])
 	Logger::enableStdoutLogging();
 	Logger::setLogLevel(DEBUG);
 
-	const auto core = Core::Create({argv, argv + argc});
+	const auto core = Core::Create();
 	core.Start();
 
 	for (;; this_thread::sleep_for(500ms))

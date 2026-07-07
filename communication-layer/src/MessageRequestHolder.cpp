@@ -10,6 +10,17 @@ using enum Logger::Level;
 
 static const Logger logger = Logger::getLoggerByCategory("MessageRequestHolder");
 
+QueueSize MessageRequestHolder::Size() const
+{
+	const lock_guard lg(_mtx);
+	return QueueSize{
+		.critical = _messageRequestsCritical.size(),
+		.high = _messageRequestsHigh.size(),
+		.normal = _messageRequestsNormal.size(),
+		.low = _messageRequestsLow.size(),
+	};
+}
+
 void MessageRequestHolder::Push(entity::MessageRequest messageRequest)
 {
 	switch (const lock_guard lg(_mtx); messageRequest.priority) {

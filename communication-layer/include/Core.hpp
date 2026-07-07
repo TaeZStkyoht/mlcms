@@ -2,6 +2,7 @@
 
 #include "GrpcServer.hpp"
 #include "MessageRequestSender.hpp"
+#include "Observer.hpp"
 
 #include <atomic>
 
@@ -14,4 +15,5 @@ public:
 private:
 	std::unique_ptr<GrpcServer> _grpcServer;
 	std::unique_ptr<MessageRequestSender> _messageRequestSender;
+	std::unique_ptr<Observer> _observer;
 };

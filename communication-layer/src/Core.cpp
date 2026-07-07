@@ -30,6 +30,8 @@ Core Core::Create(span<const char* const> arguments)
 
 	core._messageRequestSender = make_unique<MessageRequestSender>(messageRequestHolder);
 
+	core._observer = make_unique<Observer>(messageRequestHolder);
+
 	return core;
 }
 
@@ -37,4 +39,5 @@ void Core::Start() const
 {
 	_grpcServer->Start();
 	_messageRequestSender->Start();
+	_observer->Start();
 }
