@@ -28,7 +28,9 @@ Core Core::Create(span<const char* const> arguments)
 
 	core._grpcServer = make_unique<GrpcServer>(format("127.0.0.1:{}", GrpcPorts::providerToCommunicationLayer), messageRequestHolder);
 
-	core._messageRequestSender = make_unique<MessageRequestSender>(messageRequestHolder);
+	const auto grpcClient = make_shared<GrpcClient>(format("127.0.0.1:{}", GrpcPorts::communicationLayerToConsumer));
+
+	core._messageRequestSender = make_unique<MessageRequestSender>(messageRequestHolder, grpcClient);
 
 	core._observer = make_unique<Observer>(messageRequestHolder);
 

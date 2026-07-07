@@ -18,6 +18,6 @@ namespace entity {
 		Priority priority;
 		uint32_t sender_id;
 		std::chrono::system_clock::time_point timestamp;
-		std::vector<uint8_t> payload;
+		std::string payload;
 	};
 }

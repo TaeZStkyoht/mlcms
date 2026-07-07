@@ -12,10 +12,11 @@ void MessageRequestSender::Start()
 void MessageRequestSender::Work()
 {
 	while (run) {
-		auto messageRequest = _messageRequestPuller->Pull();
-		if (!messageRequest) {
-			this_thread::yield();
+		if (auto messageRequest = _messageRequestPuller->Pull(); messageRequest) {
+			_grpcClient->SendMessage(move(messageRequest->payload), messageRequest->timestamp);
 			continue;
 		}
+
+		this_thread::yield();
 	}
 }

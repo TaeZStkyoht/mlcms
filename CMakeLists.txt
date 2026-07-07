@@ -84,6 +84,8 @@ include_directories(
 include_directories(${CMAKE_CURRENT_BINARY_DIR}) # For Proto
 
 add_protobuf(communication-layer)
+add_protobuf(consumer)
 
 add_subdirectory(provider)
 add_subdirectory(communication-layer)
+add_subdirectory(consumer)

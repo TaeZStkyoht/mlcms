@@ -40,7 +40,7 @@ private:
 					.priority = static_cast<entity::MessageRequest::Priority>(messageRequest.priority()),
 					.sender_id = messageRequest.sender_id(),
 					.timestamp = system_clock::time_point(nanoseconds(util::TimeUtil::TimestampToNanoseconds(messageRequest.timestamp()))),
-					.payload = {messageRequest.payload().begin(), messageRequest.payload().end()},
+					.payload = messageRequest.payload(),
 				});
 			}
 		}

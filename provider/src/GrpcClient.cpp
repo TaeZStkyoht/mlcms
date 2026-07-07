@@ -27,13 +27,13 @@ public:
 private:
 	void Work() const
 	{
-		for (; run; this_thread::yield()) {
+		for (; run; this_thread::sleep_for(1s)) {
 			ResponseWithClientContext<Empty> clientContextWithReponse;
 			const auto clientReadWriter = _stub->SendMessage(&clientContextWithReponse.cc, &clientContextWithReponse.response);
 			if (!clientReadWriter)
 				continue;
 
-			for (; !_worker.get_stop_token().stop_requested(); this_thread::yield()) {
+			for (; !_worker.get_stop_token().stop_requested(); this_thread::sleep_for(1ms)) {
 				cl::MessageRequest messageRequest;
 				messageRequest.set_priority(
 					static_cast<cl::MessageRequest_Priority>((rand() % cl::MessageRequest_Priority::MessageRequest_Priority_CRITICAL) + 1));
