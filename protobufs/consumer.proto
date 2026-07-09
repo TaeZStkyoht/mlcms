@@ -7,7 +7,8 @@ import "google/protobuf/timestamp.proto";
 
 message OuterMessageRequest {
 	google.protobuf.Timestamp timestamp = 1;
-	bytes payload = 2;
+	google.protobuf.Timestamp queued_timestamp = 2;
+	bytes payload = 3;
 }
 
 service Consumer {

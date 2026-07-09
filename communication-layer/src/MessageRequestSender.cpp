@@ -1,5 +1,6 @@
 #include "MessageRequestSender.hpp"
 
+#include <iostream>
 #include <queue>
 
 using namespace std;
@@ -17,55 +18,49 @@ void MessageRequestSender::Work()
 	if (_grpcClients.empty())
 		return;
 
-	_ringBufferOfSenderThreads.resize(_grpcClients.size());
+	for (auto grpcClient : _grpcClients)
+		grpcClient->Start();
+
+	auto lastPrintTime = steady_clock::now();
 
 	while (run) {
-		if (unique_lock locker(_mtxMessagesWillBeRetried); !_messagesWillBeRetried.empty()) {
+		if (!_messagesWillBeRetried.empty()) {
 			auto messageRequest = move(_messagesWillBeRetried.front());
 			_messagesWillBeRetried.pop();
-			locker.unlock();
-			SendMessage(move(messageRequest));
-			continue;
+			SendMessage(messageRequest.timestamp, move(messageRequest.payload));
 		}
 
-		if (auto messageRequest = _messageRequestPuller->Pull(); messageRequest) {
-			SendMessage(move(*messageRequest));
-			continue;
+		if (auto messageRequest = _messageRequestPuller->Pull(); messageRequest)
+			SendMessage(messageRequest->timestamp, move(messageRequest->payload));
+
+		for (auto grpcClient : _grpcClients)
+			if (!grpcClient->IsAvailable())
+				for (auto&& stealedQueue = grpcClient->StealQueue(); !stealedQueue.empty(); stealedQueue.pop())
+					_messagesWillBeRetried.push(move(stealedQueue.front()));
+
+		if (steady_clock::now() - lastPrintTime > 1s) {
+			cout << "_messagesWillBeRetried: " << _messagesWillBeRetried.size() << endl;
+			lastPrintTime = steady_clock::now();
 		}
 
 		this_thread::yield();
 	}
 }
 
-void MessageRequestSender::SendMessage(entity::MessageRequest messageRequest)
+void MessageRequestSender::SendMessage(system_clock::time_point timestamp, string payload)
 {
-	const uint8_t usableGrpcClientIndex = GetNextUsableGrpcClientIndex();
-
-	_ringBufferOfSenderThreads[_threadIndex] = jthread([this, usableGrpcClientIndex, messageRequestPriv = move(messageRequest)] {
-		unique_lock locker(_mtxGrpcClients);
-		const auto sendResult = _grpcClients[usableGrpcClientIndex]->SendMessage(messageRequestPriv.payload, messageRequestPriv.timestamp);
-		locker.unlock();
-		if (!sendResult) {
-			const lock_guard lg(_mtxMessagesWillBeRetried);
-			_messagesWillBeRetried.push(move(messageRequestPriv));
-		}
+	_grpcClients[GetNextUsableGrpcClientIndex()]->SendMessage({
+		.timestamp = timestamp,
+		.queuedTimestamp = steady_clock::now(),
+		.payload = move(payload),
 	});
-
-	_threadIndex = static_cast<uint8_t>((_threadIndex + 1) % _ringBufferOfSenderThreads.size());
 }
 
 uint8_t MessageRequestSender::GetNextUsableGrpcClientIndex()
 {
-	for (const lock_guard lg(_mtxGrpcClients); run;
-		 _lastUsedGrpcClientIndex = static_cast<uint8_t>((_lastUsedGrpcClientIndex + 1) % _grpcClients.size())) {
-		if (_grpcClients[_lastUsedGrpcClientIndex]->IsAvailable())
+	for (; run; _lastUsedGrpcClientIndex = static_cast<uint8_t>((_lastUsedGrpcClientIndex + 1) % _grpcClients.size()))
+		if (_grpcClients[_lastUsedGrpcClientIndex]->IsAvailable() || steady_clock::now() - _grpcClients[_lastUsedGrpcClientIndex]->LastTriedTime() > 10s)
 			break;
-
-		if (steady_clock::now() - _grpcClients[_lastUsedGrpcClientIndex]->LastTriedTime() > 10s) {
-			_grpcClients[_lastUsedGrpcClientIndex]->Reconnect();
-			break;
-		}
-	}
 
 	return _lastUsedGrpcClientIndex;
 }

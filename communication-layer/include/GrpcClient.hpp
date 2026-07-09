@@ -2,8 +2,11 @@
 
 #include "interface/AvailabilityProvider.hpp"
 
+#include "entity/OuterMessageRequest.hpp"
+
 #include <chrono>
 #include <memory>
+#include <queue>
 #include <string>
 
 class GrpcClient final : public AvailabilityProvider {
@@ -11,13 +14,14 @@ public:
 	[[nodiscard]] GrpcClient(std::string uri);
 	~GrpcClient();
 
+	void Start();
+
+	void SendMessage(entity::OuterMessageRequest outerMessageRequest) const;
+	std::chrono::steady_clock::time_point LastTriedTime() const;
+	std::queue<entity::OuterMessageRequest>&& StealQueue();
+
 	bool IsAvailable() const override;
 	uint32_t AverageCommunicationDuration() const override;
-
-	bool SendMessage(const std::string& message, std::chrono::system_clock::time_point timestamp) const;
-
-	std::chrono::steady_clock::time_point LastTriedTime() const;
-	void Reconnect();
 
 private:
 	class Impl;
