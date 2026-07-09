@@ -28,11 +28,14 @@ Core Core::Create(span<const char* const> arguments)
 
 	core._grpcServer = make_unique<GrpcServer>(format("127.0.0.1:{}", GrpcPorts::providerToCommunicationLayer), messageRequestHolder);
 
-	const auto grpcClient = make_shared<GrpcClient>(format("127.0.0.1:{}", GrpcPorts::communicationLayerToConsumer));
+	vector<shared_ptr<GrpcClient>> grpcClients;
+	for (uint8_t i = 0; i < 10; ++i)
+		grpcClients.push_back(make_shared<GrpcClient>(format("127.0.0.1:{}", GrpcPorts::communicationLayerToConsumer + i)));
 
-	core._messageRequestSender = make_unique<MessageRequestSender>(messageRequestHolder, grpcClient);
+	core._messageRequestSender = make_unique<MessageRequestSender>(messageRequestHolder, grpcClients);
 
-	core._observer = make_unique<Observer>(messageRequestHolder);
+	core._observer =
+		make_unique<Observer>(messageRequestHolder, vector<shared_ptr<AvailabilityProvider>>{grpcClients.begin(), grpcClients.end()});
 
 	return core;
 }

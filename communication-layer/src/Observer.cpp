@@ -22,5 +22,14 @@ void Observer::Work()
 
 		logger << DEBUG << "Queue sizes (crit, high, normal, low): " << queueSize.critical << ", " << queueSize.high << ", " << queueSize.normal << ", "
 			   << queueSize.low;
+
+		{
+			const auto logStream = logger << DEBUG;
+			logStream << "Channel Average Communication: ";
+			for (size_t i = 0; i < _availabilityProvider.size(); ++i)
+				logStream << i << ": "
+						  << (_availabilityProvider[i]->IsAvailable() ? to_string(_availabilityProvider[i]->AverageCommunicationDuration()) : "N/A")
+						  << ", ";
+		}
 	}
 }

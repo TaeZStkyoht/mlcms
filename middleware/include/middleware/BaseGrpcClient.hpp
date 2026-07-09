@@ -7,14 +7,23 @@ namespace middleware {
 	template <typename StubType>
 	class BaseGrpcClient {
 	private:
+		std::string _url;
 		std::shared_ptr<grpc::Channel> _channel;
 
 	public:
 		virtual ~BaseGrpcClient() = 0;
 
-		[[nodiscard]] explicit BaseGrpcClient(const std::string& url)
-			: _channel(CreateChannel(url, grpc::InsecureChannelCredentials())), _stub(StubType::NewStub(_channel))
+		[[nodiscard]] explicit BaseGrpcClient(std::string url)
+			: _url(std::move(url)), _channel(CreateChannel(_url, grpc::InsecureChannelCredentials())), _stub(StubType::NewStub(_channel))
 		{
+		}
+
+		void Reconnect()
+		{
+			_stub.reset();
+			_channel.reset();
+			_channel = CreateChannel(_url, grpc::InsecureChannelCredentials());
+			_stub = StubType::NewStub(_channel);
 		}
 
 	protected:
