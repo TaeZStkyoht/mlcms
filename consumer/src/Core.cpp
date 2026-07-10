@@ -2,9 +2,12 @@
 
 #include "middleware/GrpcPorts.hpp"
 
+#include <atomic>
 #include <format>
 
 using namespace std;
+
+extern atomic_bool run;
 
 Core Core::Create(span<const char* const> arguments)
 {
@@ -18,5 +21,6 @@ Core Core::Create(span<const char* const> arguments)
 
 void Core::Start() const
 {
-	_grpcServer->Start();
+	if (!_grpcServer->Start())
+		run = false;
 }

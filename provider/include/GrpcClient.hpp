@@ -5,7 +5,7 @@
 
 class GrpcClient final {
 public:
-	[[nodiscard]] GrpcClient(std::string uri);
+	[[nodiscard]] explicit GrpcClient(std::string uri);
 	~GrpcClient();
 
 	void Start();

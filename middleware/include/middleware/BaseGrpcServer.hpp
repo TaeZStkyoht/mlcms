@@ -15,7 +15,7 @@ namespace middleware {
 
 		virtual ~BaseGrpcServer();
 
-		bool Start();
+		[[nodiscard]] bool Start();
 
 	private:
 		grpc::Service* _service;

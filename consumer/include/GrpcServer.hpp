@@ -5,10 +5,10 @@
 
 class GrpcServer final {
 public:
-	[[nodiscard]] GrpcServer(std::string uri);
+	explicit GrpcServer(std::string uri);
 	~GrpcServer();
 
-	void Start() const;
+	bool Start() const;
 
 private:
 	class Impl;

@@ -30,6 +30,7 @@ public:
 	bool SendMessage(const string& message, system_clock::time_point timestamp)
 	{
 		ResponseWithClientContext<Empty> clientContextWithReponse;
+		const auto startTime = steady_clock::now();
 		auto result = _stub
 						  ->SendMessage(
 							  &clientContextWithReponse.cc,
@@ -42,7 +43,8 @@ public:
 							  &clientContextWithReponse.response)
 						  .ok();
 		{
-			const auto duration = static_cast<float>(duration_cast<microseconds>(system_clock::now() - timestamp).count());
+			const auto stopTime = steady_clock::now();
+			const auto duration = static_cast<float>(duration_cast<microseconds>(stopTime - startTime).count());
 			_communicationDurationMovingAverage.store(_movingAverageAlpha * duration + (1 - _movingAverageAlpha) * _communicationDurationMovingAverage);
 		}
 
@@ -71,7 +73,7 @@ private:
 	}
 
 	static constexpr uint8_t _maxConsecutiveErrorCount = 10;
-	static constexpr auto _movingAverageAlpha = 0.01f;
+	static constexpr auto _movingAverageAlpha = 0.001f;
 
 	atomic<float> _communicationDurationMovingAverage{};
 

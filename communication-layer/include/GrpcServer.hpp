@@ -7,10 +7,10 @@
 
 class GrpcServer final {
 public:
-	[[nodiscard]] GrpcServer(std::string uri, std::shared_ptr<MessageRequestPusher> messageRequestPusher);
+	GrpcServer(std::string uri, std::shared_ptr<MessageRequestPusher> messageRequestPusher);
 	~GrpcServer();
 
-	void Start() const;
+	bool Start() const;
 
 private:
 	class Impl;

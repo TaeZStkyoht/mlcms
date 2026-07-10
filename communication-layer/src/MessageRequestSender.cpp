@@ -1,5 +1,6 @@
 #include "MessageRequestSender.hpp"
 
+#include <algorithm>
 #include <queue>
 
 using namespace std;
@@ -41,7 +42,7 @@ void MessageRequestSender::SendMessage(entity::MessageRequest messageRequest)
 {
 	const lock_guard lgThreadIndexSelector(_mtxThreadIndexSelector);
 	_ringBufferOfSenderThreads[_threadIndex] = jthread([this, messageRequestPriv = move(messageRequest)] { SendMessageWork(move(messageRequestPriv)); });
-	_threadIndex = static_cast<uint8_t>((_threadIndex + 1) % _ringBufferOfSenderThreads.size());
+	RingBufferNextIndex(_threadIndex, _ringBufferOfSenderThreads.size());
 }
 
 void MessageRequestSender::SendMessageWork(entity::MessageRequest messageRequest)
@@ -60,22 +61,66 @@ uint8_t MessageRequestSender::GetNextUsableGrpcClientIndex()
 	const lock_guard lg(_mtxGrpcIndexSelector);
 
 	while (run) {
-		_lastUsedGrpcClientIndex = static_cast<uint8_t>((_lastUsedGrpcClientIndex + 1) % _grpcClients.size());
-
-		if (_grpcClientsInUse[_lastUsedGrpcClientIndex].load()) {
-			this_thread::yield();
-			continue;
-		}
-
-		if (_grpcClients[_lastUsedGrpcClientIndex]->IsAvailable())
-			break;
-
-		if (steady_clock::now() - _grpcClients[_lastUsedGrpcClientIndex]->LastTriedTime() > 10s) {
-			_grpcClients[_lastUsedGrpcClientIndex]->Reconnect();
+		if (const auto candidateIndex = TryGetFromAvailables(); candidateIndex) {
+			_lastUsedGrpcClientIndex = *candidateIndex;
 			break;
 		}
+
+		if (const auto candidateIndex = TryGetFromNonAvailables(); candidateIndex) {
+			_lastUsedGrpcClientIndex = *candidateIndex;
+			break;
+		}
+
+		this_thread::yield();
 	}
 
 	_grpcClientsInUse[_lastUsedGrpcClientIndex].store(true);
+	_lastUsedGrpcClients[RingBufferNextIndex(_lastUsedGrpcClientsEmplacerIndex, _lastUsedGrpcClients.size())] = _lastUsedGrpcClientIndex;
 	return _lastUsedGrpcClientIndex;
+}
+
+optional<uint8_t> MessageRequestSender::TryGetFromAvailables() const
+{
+	// Check available clients' sending speed as frequency
+	float totalCommunicationFrequencyOfAvailableGrpcClients{};
+	multimap<float, uint8_t, greater<>> mapRateOfCommunicationFrequencyOfAvailableGrpcClients;
+	for (uint8_t i = 0; i < _grpcClients.size(); ++i) {
+		if (_grpcClients[i]->IsAvailable()) {
+			const float frequency = 1 / static_cast<float>(_grpcClients[i]->AverageCommunicationDuration());
+			totalCommunicationFrequencyOfAvailableGrpcClients += frequency;
+			mapRateOfCommunicationFrequencyOfAvailableGrpcClients.emplace(frequency, i);
+		}
+	}
+
+	multimap<float, uint8_t> utilizationRate;
+	// Select if client's relative sending frequency rate is greater than recent occurance rate and clientis currently not in used.
+	// Basically, try to select the one that can be more utilized.
+	for (auto [frequency, grpcClientIndex] : mapRateOfCommunicationFrequencyOfAvailableGrpcClients)
+		if (!_grpcClientsInUse.at(grpcClientIndex).load())
+			utilizationRate.emplace(FrequencyOfGrpcClientIndexOnLastUsages(grpcClientIndex) /
+										(frequency / totalCommunicationFrequencyOfAvailableGrpcClients),
+									grpcClientIndex);
+
+	if (!utilizationRate.empty())
+		return utilizationRate.begin()->second;
+
+	return {};
+}
+
+optional<uint8_t> MessageRequestSender::TryGetFromNonAvailables() const
+{
+	uint8_t i = _lastUsedGrpcClientIndex;
+	RingBufferNextIndex(i, _grpcClients.size());
+	for (; i < _grpcClients.size() + _lastUsedGrpcClientIndex; ++i)
+		if (const auto realIndex = static_cast<uint8_t>(i % _grpcClients.size());
+			!_grpcClients[realIndex]->IsAvailable() && steady_clock::now() - _grpcClients[realIndex]->LastTriedTime() > 10s)
+			return realIndex;
+	return {};
+}
+
+float MessageRequestSender::FrequencyOfGrpcClientIndexOnLastUsages(uint8_t grpcClientIndex) const
+{
+	return static_cast<float>(ranges::count_if(
+			   _lastUsedGrpcClients, [grpcClientIndex](uint8_t usedGrpcClientIndex) noexcept { return usedGrpcClientIndex == grpcClientIndex; })) /
+		   static_cast<float>(_lastUsedGrpcClients.size());
 }

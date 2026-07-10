@@ -57,7 +57,7 @@ GrpcServer::GrpcServer(string url, shared_ptr<MessageRequestPusher> messageReque
 
 GrpcServer::~GrpcServer() = default;
 
-void GrpcServer::Start() const
+bool GrpcServer::Start() const
 {
-	_impl->Start();
+	return _impl->Start();
 }

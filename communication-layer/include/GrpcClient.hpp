@@ -8,7 +8,7 @@
 
 class GrpcClient final : public AvailabilityProvider {
 public:
-	[[nodiscard]] GrpcClient(std::string uri);
+	[[nodiscard]] explicit GrpcClient(std::string uri);
 	~GrpcClient();
 
 	bool IsAvailable() const override;

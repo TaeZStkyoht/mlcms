@@ -24,7 +24,7 @@ static const Logger logger = Logger::getLoggerByCategory("GrpcServer");
 
 class GrpcServer::Impl final : public cl::Consumer::Service, public BaseGrpcServer {
 public:
-	Impl(string url) noexcept : BaseGrpcServer(this, move(url))
+	explicit Impl(string url) noexcept : BaseGrpcServer(this, move(url))
 	{
 	}
 
@@ -41,7 +41,7 @@ GrpcServer::GrpcServer(string url) : _impl(make_unique<Impl>(move(url)))
 
 GrpcServer::~GrpcServer() = default;
 
-void GrpcServer::Start() const
+bool GrpcServer::Start() const
 {
-	_impl->Start();
+	return _impl->Start();
 }
