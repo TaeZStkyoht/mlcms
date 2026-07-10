@@ -13,8 +13,6 @@ using namespace google::protobuf;
 
 using namespace middleware;
 
-extern const atomic_bool run;
-
 class GrpcClient::Impl final : public BaseGrpcClient<cl::CommunicationLayer> {
 public:
 	using BaseGrpcClient::BaseGrpcClient;
@@ -27,7 +25,7 @@ public:
 private:
 	void Work() const
 	{
-		for (; run; this_thread::sleep_for(1s)) {
+		for (; !_worker.get_stop_token().stop_requested(); this_thread::sleep_for(1s)) {
 			ResponseWithClientContext<Empty> clientContextWithReponse;
 			const auto clientReadWriter = _stub->SendMessage(&clientContextWithReponse.cc, &clientContextWithReponse.response);
 			if (!clientReadWriter)
@@ -39,7 +37,7 @@ private:
 					static_cast<cl::MessageRequest_Priority>((rand() % cl::MessageRequest_Priority::MessageRequest_Priority_CRITICAL) + 1));
 				messageRequest.set_sender_id(getpid());
 				AssignTimePointToProtoTimestamp(messageRequest.mutable_timestamp(), system_clock::now());
-				messageRequest.set_payload(string(static_cast<uint8_t>(rand() % UINT8_MAX) + 1, static_cast<uint8_t>(rand() % UINT8_MAX)));
+				messageRequest.set_payload(string(static_cast<uint8_t>(rand() % UINT8_MAX) + 1, static_cast<uint8_t>(rand() % (UINT8_MAX + 1))));
 				if (!clientReadWriter->Write(messageRequest))
 					break;
 			}
