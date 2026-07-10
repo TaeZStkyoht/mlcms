@@ -30,7 +30,6 @@ public:
 	bool SendMessage(const string& message, system_clock::time_point timestamp)
 	{
 		ResponseWithClientContext<Empty> clientContextWithReponse;
-		const auto startTime = steady_clock::now();
 		auto result = _stub
 						  ->SendMessage(
 							  &clientContextWithReponse.cc,
@@ -43,8 +42,7 @@ public:
 							  &clientContextWithReponse.response)
 						  .ok();
 		{
-			const auto stopTime = steady_clock::now();
-			const auto duration = static_cast<float>(duration_cast<microseconds>(stopTime - startTime).count());
+			const auto duration = static_cast<float>(duration_cast<microseconds>(system_clock::now() - timestamp).count());
 			_communicationDurationMovingAverage.store(_movingAverageAlpha * duration + (1 - _movingAverageAlpha) * _communicationDurationMovingAverage);
 		}
 
@@ -73,12 +71,12 @@ private:
 	}
 
 	static constexpr uint8_t _maxConsecutiveErrorCount = 10;
-	static constexpr auto _movingAverageAlpha = 0.05f;
+	static constexpr auto _movingAverageAlpha = 0.01f;
 
 	atomic<float> _communicationDurationMovingAverage{};
 
 	atomic_uint8_t _consecutiveErrorCount{};
-	atomic_bool _isAvailable = true;
+	atomic_bool _isAvailable{};
 	atomic<steady_clock::time_point> _lastTriedTime{};
 };
 

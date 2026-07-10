@@ -23,18 +23,21 @@ private:
 	void Work();
 
 	void SendMessage(entity::MessageRequest messageRequest);
+	void SendMessageWork(entity::MessageRequest messageRequest);
 	uint8_t GetNextUsableGrpcClientIndex();
 
 	std::shared_ptr<MessageRequestPuller> _messageRequestPuller;
-
 	std::vector<std::shared_ptr<GrpcClient>> _grpcClients;
-	std::mutex _mtxGrpcClients;
 
+	std::map<uint8_t, std::atomic_bool> _grpcClientsInUse;
 	std::queue<entity::MessageRequest> _messagesWillBeRetried;
-	std::mutex _mtxMessagesWillBeRetried;
 
-	uint8_t _threadIndex{};
 	uint8_t _lastUsedGrpcClientIndex{};
+	uint8_t _threadIndex{};
+
+	std::mutex _mtxMessagesWillBeRetried;
+	std::mutex _mtxGrpcIndexSelector;
+	std::mutex _mtxThreadIndexSelector;
 
 	std::vector<std::jthread> _ringBufferOfSenderThreads;
 	std::jthread _worker;

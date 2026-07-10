@@ -39,25 +39,34 @@ void MessageRequestSender::Work()
 
 void MessageRequestSender::SendMessage(entity::MessageRequest messageRequest)
 {
-	const uint8_t usableGrpcClientIndex = GetNextUsableGrpcClientIndex();
-
-	_ringBufferOfSenderThreads[_threadIndex] = jthread([this, usableGrpcClientIndex, messageRequestPriv = move(messageRequest)] {
-		unique_lock locker(_mtxGrpcClients);
-		const auto sendResult = _grpcClients[usableGrpcClientIndex]->SendMessage(messageRequestPriv.payload, messageRequestPriv.timestamp);
-		locker.unlock();
-		if (!sendResult) {
-			const lock_guard lg(_mtxMessagesWillBeRetried);
-			_messagesWillBeRetried.push(move(messageRequestPriv));
-		}
-	});
-
+	const lock_guard lgThreadIndexSelector(_mtxThreadIndexSelector);
+	_ringBufferOfSenderThreads[_threadIndex] = jthread([this, messageRequestPriv = move(messageRequest)] { SendMessageWork(move(messageRequestPriv)); });
 	_threadIndex = static_cast<uint8_t>((_threadIndex + 1) % _ringBufferOfSenderThreads.size());
+}
+
+void MessageRequestSender::SendMessageWork(entity::MessageRequest messageRequest)
+{
+	const auto usableGrpcClientIndex = GetNextUsableGrpcClientIndex();
+	const auto sendResult = _grpcClients[usableGrpcClientIndex]->SendMessage(messageRequest.payload, messageRequest.timestamp);
+	_grpcClientsInUse[usableGrpcClientIndex].store(false);
+	if (!sendResult) {
+		const lock_guard lg(_mtxMessagesWillBeRetried);
+		_messagesWillBeRetried.push(move(messageRequest));
+	}
 }
 
 uint8_t MessageRequestSender::GetNextUsableGrpcClientIndex()
 {
-	for (const lock_guard lg(_mtxGrpcClients); run;
-		 _lastUsedGrpcClientIndex = static_cast<uint8_t>((_lastUsedGrpcClientIndex + 1) % _grpcClients.size())) {
+	const lock_guard lg(_mtxGrpcIndexSelector);
+
+	while (run) {
+		_lastUsedGrpcClientIndex = static_cast<uint8_t>((_lastUsedGrpcClientIndex + 1) % _grpcClients.size());
+
+		if (_grpcClientsInUse[_lastUsedGrpcClientIndex].load()) {
+			this_thread::yield();
+			continue;
+		}
+
 		if (_grpcClients[_lastUsedGrpcClientIndex]->IsAvailable())
 			break;
 
@@ -67,5 +76,6 @@ uint8_t MessageRequestSender::GetNextUsableGrpcClientIndex()
 		}
 	}
 
+	_grpcClientsInUse[_lastUsedGrpcClientIndex].store(true);
 	return _lastUsedGrpcClientIndex;
 }
