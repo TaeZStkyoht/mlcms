@@ -1,1 +1,1 @@
-add_library(MockSleepWrapper OBJECT MockSleepWrapper.cpp)
+add_library(MockSleepWrapper SHARED MockSleepWrapper.cpp)

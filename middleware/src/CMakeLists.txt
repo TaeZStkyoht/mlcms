@@ -1,3 +1,3 @@
-add_library(Logger OBJECT Logger.cpp)
-add_library(BaseGrpcServer OBJECT BaseGrpcServer.cpp)
-add_library(SleepWrapper OBJECT SleepWrapper.cpp)
+add_library(Logger SHARED Logger.cpp)
+add_library(BaseGrpcServer SHARED BaseGrpcServer.cpp)
+add_library(SleepWrapper SHARED SleepWrapper.cpp)

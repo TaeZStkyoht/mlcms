@@ -1,1 +1,1 @@
-add_library(FakeLogger OBJECT FakeLogger.cpp)
+add_library(FakeLogger SHARED FakeLogger.cpp)

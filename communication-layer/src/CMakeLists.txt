@@ -15,13 +15,13 @@ add_executable(${PROJECT_NAME} main.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcClient>
 	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcServer>
 	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestHolder>
-	$<TARGET_OBJECTS:BaseGrpcServer>
-	$<TARGET_OBJECTS:Logger>
 	$<TARGET_OBJECTS:SleepWrapper>
 	$<TARGET_OBJECTS:communication-layer-proto>
 	$<TARGET_OBJECTS:consumer-proto>
 )
 target_link_libraries(${PROJECT_NAME}
-	gRPC::grpc++_unsecure
+	BaseGrpcServer
+	Logger
 	log4cpp
+	gRPC::grpc++_unsecure
 )

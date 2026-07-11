@@ -20,9 +20,10 @@ add_executable(${PROJECT_NAME}-unit_test_Core unit_test_Core.cpp
 
 add_executable(${PROJECT_NAME}-unit_test_GrpcServer unit_test_GrpcServer.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcServer>
-	$<TARGET_OBJECTS:BaseGrpcServer>
 	$<TARGET_OBJECTS:consumer-proto>
 )
 target_link_libraries(${PROJECT_NAME}-unit_test_GrpcServer
+	BaseGrpcServer
+	FakeLogger
 	gRPC::grpc++_unsecure
 )
