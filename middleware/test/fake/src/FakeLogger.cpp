@@ -36,34 +36,34 @@ bool FakeLogger::LogInfo::match(string_view category, Logger::Level logLevel, st
 	}();
 }
 
-void Logger::logEvent(Logger::Level logLevel, milliseconds timestamp, const string& message) const
+void Logger::LogEvent(Logger::Level logLevel, milliseconds timestamp, const string& message) const
 {
 	const lock_guard lg(FakeLogger::_logsMutex);
 	FakeLogger::_logs.emplace_back(&_category, logLevel, timestamp, message);
 }
 
-Logger Logger::getLoggerByCategory(const string& categoryName)
+Logger Logger::GetLoggerByCategory(const string& categoryName)
 {
 	const lock_guard lg(FakeLogger::_categoriesMutex);
 	return Logger(*FakeLogger::_categories.emplace_back(make_unique<log4cpp::Category>(categoryName)));
 }
 
-void Logger::setLogLevel(Logger::Level)
+void Logger::SetLogLevel(Logger::Level)
 {
 	// Doesn't need to be defined
 }
 
-void Logger::enableFileLogging(const string&)
+void Logger::EnableFileLogging(const string&)
 {
 	// Doesn't need to be defined
 }
 
-void Logger::enableStdoutLogging()
+void Logger::EnableStdoutLogging()
 {
 	// Doesn't need to be defined
 }
 
-void Logger::enableSysLogLogging(const string&)
+void Logger::EnableSysLogLogging(const string&)
 {
 	// Doesn't need to be defined
 }

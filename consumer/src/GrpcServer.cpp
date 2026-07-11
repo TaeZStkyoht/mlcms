@@ -20,7 +20,7 @@ using enum Logger::Level;
 
 extern const atomic_bool run;
 
-static const Logger logger = Logger::getLoggerByCategory("GrpcServer");
+static const Logger logger = Logger::GetLoggerByCategory("GrpcServer");
 
 class GrpcServer::Impl final : public cl::Consumer::Service, public BaseGrpcServer {
 public:

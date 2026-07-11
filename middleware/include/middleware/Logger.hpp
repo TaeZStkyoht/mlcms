@@ -44,17 +44,17 @@ namespace middleware {
 		};
 
 	public:
-		void logEvent(Level level, std::chrono::milliseconds timestamp, const std::string& message) const;
+		void LogEvent(Level level, std::chrono::milliseconds timestamp, const std::string& message) const;
 		LogStream operator<<(Level level) const
 		{
 			return LogStream(level, _category);
 		}
 
-		static Logger getLoggerByCategory(const std::string& categoryName);
-		static void setLogLevel(Level level);
-		static void enableFileLogging(const std::string& logFileName);
-		static void enableStdoutLogging();
-		static void enableSysLogLogging(const std::string& syslogName);
+		static Logger GetLoggerByCategory(const std::string& categoryName);
+		static void SetLogLevel(Level level);
+		static void EnableFileLogging(const std::string& logFileName);
+		static void EnableStdoutLogging();
+		static void EnableSysLogLogging(const std::string& syslogName);
 
 	private:
 		explicit constexpr Logger(log4cpp::Category& category) noexcept : _category(category)

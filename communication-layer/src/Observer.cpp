@@ -9,7 +9,7 @@ using namespace middleware;
 
 using enum Logger::Level;
 
-static const Logger logger = Logger::getLoggerByCategory("Observer");
+static const Logger logger = Logger::GetLoggerByCategory("Observer");
 
 void Observer::Start()
 {

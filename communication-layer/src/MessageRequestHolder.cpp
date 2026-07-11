@@ -8,7 +8,7 @@ using namespace middleware;
 
 using enum Logger::Level;
 
-static const Logger logger = Logger::getLoggerByCategory("MessageRequestHolder");
+static const Logger logger = Logger::GetLoggerByCategory("MessageRequestHolder");
 
 QueueSize MessageRequestHolder::Size() const
 {

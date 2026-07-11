@@ -12,7 +12,7 @@ using namespace middleware;
 
 using enum Logger::Level;
 
-static const Logger logger = Logger::getLoggerByCategory("BaseGrpcServer");
+static const Logger logger = Logger::GetLoggerByCategory("BaseGrpcServer");
 
 static constexpr auto GetShutdownTimespec(std::chrono::milliseconds timeoutDurationForShutdown)
 {

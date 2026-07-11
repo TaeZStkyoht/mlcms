@@ -34,14 +34,14 @@ static constexpr Priority::PriorityLevel logLevelToPriority(Logger::Level level)
 	}
 }
 
-void Logger::logEvent(Logger::Level logLevel, milliseconds timestamp, const string& message) const
+void Logger::LogEvent(Logger::Level logLevel, milliseconds timestamp, const string& message) const
 {
 	LoggingEvent event(_category.getName(), message, NDC::get(), logLevelToPriority(logLevel));
 	event.timeStamp = TimeStamp(static_cast<unsigned int>(timestamp.count() / 1000), static_cast<unsigned int>((timestamp.count() % 1000) * 1000));
 	_category.callAppenders(event);
 }
 
-Logger Logger::getLoggerByCategory(const string& categoryName)
+Logger Logger::GetLoggerByCategory(const string& categoryName)
 {
 	Category* category = Category::exists(categoryName);
 	if (category == nullptr)
@@ -49,12 +49,12 @@ Logger Logger::getLoggerByCategory(const string& categoryName)
 	return Logger(*category);
 }
 
-void Logger::setLogLevel(Logger::Level level)
+void Logger::SetLogLevel(Logger::Level level)
 {
 	Category::getRoot().setPriority(logLevelToPriority(level));
 }
 
-void Logger::enableFileLogging(const string& logFileName)
+void Logger::EnableFileLogging(const string& logFileName)
 {
 	auto appender = make_unique<FileAppender>("FileAppender", logFileName);
 	auto layout = make_unique<PatternLayout>();
@@ -63,7 +63,7 @@ void Logger::enableFileLogging(const string& logFileName)
 	Category::getRoot().addAppender(appender.release());
 }
 
-void Logger::enableStdoutLogging()
+void Logger::EnableStdoutLogging()
 {
 	auto appender = make_unique<OstreamAppender>("Console", &cout);
 	auto layout = make_unique<PatternLayout>();
@@ -72,7 +72,7 @@ void Logger::enableStdoutLogging()
 	Category::getRoot().addAppender(appender.release());
 }
 
-void Logger::enableSysLogLogging(const string& syslogName)
+void Logger::EnableSysLogLogging(const string& syslogName)
 {
 	auto appender = make_unique<SyslogAppender>("SysLog", syslogName);
 	auto layout = make_unique<PatternLayout>();

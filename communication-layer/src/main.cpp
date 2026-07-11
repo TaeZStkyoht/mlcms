@@ -12,7 +12,7 @@ using namespace middleware;
 
 using enum Logger::Level;
 
-static const Logger logger = Logger::getLoggerByCategory("main");
+static const Logger logger = Logger::GetLoggerByCategory("main");
 
 atomic_bool run = true;
 
@@ -25,8 +25,8 @@ int main(int argc, const char* argv[])
 	signal(SIGTERM, signalHandler);
 	signal(SIGINT, signalHandler);
 
-	Logger::enableStdoutLogging();
-	Logger::setLogLevel(DEBUG);
+	Logger::EnableStdoutLogging();
+	Logger::SetLogLevel(DEBUG);
 
 	const auto core = Core::Create({argv, argv + argc});
 	core.Start();
