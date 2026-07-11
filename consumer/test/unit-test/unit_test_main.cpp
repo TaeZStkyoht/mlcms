@@ -27,5 +27,5 @@ TEST(main, CoreOkAndRaiseSignalSIGTERMAndReturnSuccess)
 
 	EXPECT_TRUE(mockCoreCallbackCreateCalled);
 	EXPECT_TRUE(mockCoreCallbackStartCalled);
-	EXPECT_TRUE(FakeLogger::checkAnyLog("main", Logger::Level::INFO, "signal caught!"));
+	EXPECT_TRUE(FakeLogger::CheckAnyLog("main", Logger::Level::INFO, "signal caught!"));
 }

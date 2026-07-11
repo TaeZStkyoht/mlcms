@@ -21,16 +21,16 @@ namespace middleware {
 		friend class Logger;
 
 	public:
-		static void clear() noexcept
+		static void Clear() noexcept
 		{
 			const std::lock_guard lg(_logsMutex);
 			_logs.clear();
 		}
 
-		static void clearByCategoryName(std::string_view categoryName);
+		static void ClearByCategoryName(std::string_view categoryName);
 
-		static bool checkAnyLog(std::string_view category, Logger::Level logLevel, std::string_view message, bool exactMessage = true);
-		static bool checkLastLog(std::string_view category, Logger::Level logLevel, std::string_view message, bool exactMessage = true) noexcept;
+		static bool CheckAnyLog(std::string_view category, Logger::Level logLevel, std::string_view message, bool exactMessage = true);
+		static bool CheckLastLog(std::string_view category, Logger::Level logLevel, std::string_view message, bool exactMessage = true) noexcept;
 
 	private:
 		class LogInfo final {
@@ -43,7 +43,7 @@ namespace middleware {
 			{
 			}
 
-			bool match(std::string_view category, Logger::Level logLevel, std::string_view message, bool exactMessage) const noexcept;
+			bool Match(std::string_view category, Logger::Level logLevel, std::string_view message, bool exactMessage) const noexcept;
 
 		private:
 			log4cpp::Category* _category;

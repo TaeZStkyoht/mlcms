@@ -7,27 +7,27 @@ using namespace log4cpp;
 
 using namespace middleware;
 
-void FakeLogger::clearByCategoryName(string_view categoryName)
+void FakeLogger::ClearByCategoryName(string_view categoryName)
 {
 	const lock_guard lg(_logsMutex);
 	_logs.erase(remove_if(_logs.begin(), _logs.end(), [categoryName](const LogInfo& logInfo) noexcept { return logInfo._category->name == categoryName; }),
 				_logs.end());
 }
 
-bool FakeLogger::checkAnyLog(string_view category, Logger::Level logLevel, string_view message, bool exactMessage)
+bool FakeLogger::CheckAnyLog(string_view category, Logger::Level logLevel, string_view message, bool exactMessage)
 {
 	const lock_guard lg(_logsMutex);
 	return any_of(FakeLogger::_logs.begin(), FakeLogger::_logs.end(),
-				  [&](const LogInfo& item) noexcept { return item.match(category, logLevel, message, exactMessage); });
+				  [&](const LogInfo& item) noexcept { return item.Match(category, logLevel, message, exactMessage); });
 }
 
-bool FakeLogger::checkLastLog(string_view category, Logger::Level logLevel, string_view message, bool exactMessage) noexcept
+bool FakeLogger::CheckLastLog(string_view category, Logger::Level logLevel, string_view message, bool exactMessage) noexcept
 {
 	const lock_guard lg(_logsMutex);
-	return !FakeLogger::_logs.empty() && FakeLogger::_logs.back().match(category, logLevel, message, exactMessage);
+	return !FakeLogger::_logs.empty() && FakeLogger::_logs.back().Match(category, logLevel, message, exactMessage);
 }
 
-bool FakeLogger::LogInfo::match(string_view category, Logger::Level logLevel, string_view message, bool exactMessage) const noexcept
+bool FakeLogger::LogInfo::Match(string_view category, Logger::Level logLevel, string_view message, bool exactMessage) const noexcept
 {
 	return _category->name == category && _logLevel == logLevel && [&]() noexcept {
 		if (exactMessage)

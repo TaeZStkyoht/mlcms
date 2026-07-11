@@ -1,4 +1,4 @@
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin/test_binary)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin/test_binary)
 
 find_package(GTest REQUIRED)
 
