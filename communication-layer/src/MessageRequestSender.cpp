@@ -1,7 +1,6 @@
 #include "MessageRequestSender.hpp"
 
 #include <algorithm>
-#include <queue>
 
 using namespace std;
 using namespace chrono;
@@ -83,24 +82,26 @@ optional<uint8_t> MessageRequestSender::TryGetFromAvailables() const
 {
 	// Check available clients' sending speed as frequency
 	float totalCommunicationFrequencyOfAvailableGrpcClients{};
-	multimap<float, uint8_t, greater<>> mapRateOfCommunicationFrequencyOfAvailableGrpcClients;
+	vector<pair<float, uint8_t>> mapRateOfCommunicationFrequencyOfAvailableGrpcClients;
 	for (uint8_t i = 0; i < _grpcClients.size(); ++i) {
 		if (_grpcClients[i]->IsAvailable()) {
 			const float frequency = 1 / static_cast<float>(_grpcClients[i]->AverageCommunicationDuration());
 			totalCommunicationFrequencyOfAvailableGrpcClients += frequency;
-			mapRateOfCommunicationFrequencyOfAvailableGrpcClients.emplace(frequency, i);
+			mapRateOfCommunicationFrequencyOfAvailableGrpcClients.emplace_back(frequency, i);
 		}
 	}
 
 	multimap<float, uint8_t> utilizationRate;
-	// Select if client's relative sending frequency rate is greater than recent occurance rate and clientis currently not in used.
-	// Basically, try to select the one that can be more utilized.
-	for (auto [frequency, grpcClientIndex] : mapRateOfCommunicationFrequencyOfAvailableGrpcClients)
-		if (!_grpcClientsInUse.at(grpcClientIndex).load())
-			utilizationRate.emplace(FrequencyOfGrpcClientIndexOnLastUsages(grpcClientIndex) /
-										(frequency / totalCommunicationFrequencyOfAvailableGrpcClients),
-									grpcClientIndex);
+	// Select if client's relative sending frequency rate is greater than recent occurance rate and clients currently not in used.
+	for (auto [frequency, grpcClientIndex] : mapRateOfCommunicationFrequencyOfAvailableGrpcClients) {
+		if (!_grpcClientsInUse.at(grpcClientIndex).load()) {
+			const auto recentUsageRate = FrequencyOfGrpcClientIndexOnLastUsages(grpcClientIndex);
+			const auto relativeRateBasedOnCommunicationSpeed = frequency / totalCommunicationFrequencyOfAvailableGrpcClients;
+			utilizationRate.emplace(recentUsageRate / relativeRateBasedOnCommunicationSpeed, grpcClientIndex);
+		}
+	}
 
+	// Basically, try to select the one that can be utilized mostly.
 	if (!utilizationRate.empty())
 		return utilizationRate.begin()->second;
 
@@ -113,7 +114,7 @@ optional<uint8_t> MessageRequestSender::TryGetFromNonAvailables() const
 	RingBufferNextIndex(i, _grpcClients.size());
 	for (; i < _grpcClients.size() + _lastUsedGrpcClientIndex; ++i)
 		if (const auto realIndex = static_cast<uint8_t>(i % _grpcClients.size());
-			!_grpcClients[realIndex]->IsAvailable() && steady_clock::now() - _grpcClients[realIndex]->LastTriedTime() > 10s)
+			!_grpcClients[realIndex]->IsAvailable() && steady_clock::now() - _grpcClients[realIndex]->LastTriedTime() > _retryTimeForNonAvailable)
 			return realIndex;
 	return {};
 }

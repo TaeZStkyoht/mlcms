@@ -34,6 +34,8 @@ private:
 		return currentIndex = static_cast<T>((currentIndex + 1) % exclusiveMaximum);
 	}
 
+	static constexpr auto _retryTimeForNonAvailable = std::chrono::seconds(10);
+
 	std::shared_ptr<MessageRequestPuller> _messageRequestPuller;
 	std::vector<std::shared_ptr<GrpcClient>> _grpcClients;
 

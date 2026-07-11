@@ -46,6 +46,7 @@ public:
 			const auto stopTime = steady_clock::now();
 			const auto duration = static_cast<float>(duration_cast<microseconds>(stopTime - startTime).count());
 			_communicationDurationMovingAverage.store(_movingAverageAlpha * duration + (1 - _movingAverageAlpha) * _communicationDurationMovingAverage);
+			_lastTriedTime.store(stopTime);
 		}
 
 		if (_isAvailable) {
@@ -55,7 +56,6 @@ public:
 		else if (result)
 			_isAvailable = true;
 
-		_lastTriedTime.store(steady_clock::now());
 		return result;
 	}
 
@@ -106,9 +106,4 @@ bool GrpcClient::SendMessage(const string& message, system_clock::time_point tim
 steady_clock::time_point GrpcClient::LastTriedTime() const
 {
 	return _impl->LastTriedTime();
-}
-
-void GrpcClient::Reconnect()
-{
-	_impl->Reconnect();
 }

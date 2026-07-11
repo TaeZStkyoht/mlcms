@@ -17,7 +17,6 @@ public:
 	bool SendMessage(const std::string& message, std::chrono::system_clock::time_point timestamp) const;
 
 	std::chrono::steady_clock::time_point LastTriedTime() const;
-	void Reconnect();
 
 private:
 	class Impl;
