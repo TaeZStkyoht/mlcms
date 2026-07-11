@@ -1,6 +1,7 @@
 #include "Observer.hpp"
 
 #include "middleware/Logger.hpp"
+#include "middleware/SleepWrapper.hpp"
 
 using namespace std;
 
@@ -17,7 +18,7 @@ void Observer::Start()
 
 void Observer::Work()
 {
-	for (; !_worker.get_stop_token().stop_requested(); this_thread::sleep_for(1s)) {
+	for (; !_worker.get_stop_token().stop_requested(); SleepWrapper::Sleep(1s)) {
 		const auto queueSize = _messageRequestObserver->Size();
 
 		logger << DEBUG << "Queue sizes (crit, high, normal, low): " << queueSize.critical << ", " << queueSize.high << ", " << queueSize.normal << ", "

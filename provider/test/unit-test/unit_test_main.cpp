@@ -18,15 +18,12 @@ TEST(main, CoreOkAndRaiseSignalSIGTERMAndReturnSuccess)
 	MockCore::callbackCreate = [&mockCoreCallbackCreateCalled] noexcept { mockCoreCallbackCreateCalled = true; };
 
 	bool mockCoreCallbackStartCalled = false;
-	MockCore::callbackStart = [&mockCoreCallbackStartCalled] noexcept { mockCoreCallbackStartCalled = true; };
+	MockCore::callbackStart = [&mockCoreCallbackStartCalled] noexcept {
+		mockCoreCallbackStartCalled = true;
+		raise(SIGTERM);
+	};
 
-	{
-		const jthread signaller([] {
-			this_thread::sleep_for(1s);
-			raise(SIGTERM);
-		});
-		EXPECT_EQ(fake_main(), EXIT_SUCCESS);
-	}
+	EXPECT_EQ(fake_main(), EXIT_SUCCESS);
 
 	EXPECT_TRUE(mockCoreCallbackCreateCalled);
 	EXPECT_TRUE(mockCoreCallbackStartCalled);

@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME} main.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestHolder>
 	$<TARGET_OBJECTS:BaseGrpcServer>
 	$<TARGET_OBJECTS:Logger>
+	$<TARGET_OBJECTS:SleepWrapper>
 	$<TARGET_OBJECTS:communication-layer-proto>
 	$<TARGET_OBJECTS:consumer-proto>
 )

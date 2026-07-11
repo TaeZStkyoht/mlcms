@@ -8,6 +8,7 @@ add_executable(${PROJECT_NAME} main.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcServer>
 	$<TARGET_OBJECTS:BaseGrpcServer>
 	$<TARGET_OBJECTS:Logger>
+	$<TARGET_OBJECTS:SleepWrapper>
 	$<TARGET_OBJECTS:consumer-proto>
 )
 target_link_libraries(${PROJECT_NAME}

@@ -1,6 +1,7 @@
 #include "GrpcClient.hpp"
 
 #include "middleware/BaseGrpcClient.hpp"
+#include "middleware/SleepWrapper.hpp"
 
 #include "communication-layer.grpc.pb.h"
 
@@ -25,13 +26,13 @@ public:
 private:
 	void Work() const
 	{
-		for (; !_worker.get_stop_token().stop_requested(); this_thread::sleep_for(1s)) {
+		for (; !_worker.get_stop_token().stop_requested(); SleepWrapper::Sleep(1s)) {
 			ResponseWithClientContext<Empty> clientContextWithReponse;
 			const auto clientReadWriter = _stub->SendMessage(&clientContextWithReponse.cc, &clientContextWithReponse.response);
 			if (!clientReadWriter)
 				continue;
 
-			for (; !_worker.get_stop_token().stop_requested(); this_thread::sleep_for(1ms)) {
+			for (; !_worker.get_stop_token().stop_requested(); SleepWrapper::Sleep(1ms)) {
 				cl::MessageRequest messageRequest;
 				messageRequest.set_priority(
 					static_cast<cl::MessageRequest_Priority>((rand() % cl::MessageRequest_Priority::MessageRequest_Priority_CRITICAL) + 1));

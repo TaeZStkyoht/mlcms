@@ -1,10 +1,11 @@
 #include "Core.hpp"
 
 #include "middleware/Logger.hpp"
+#include "middleware/SleepWrapper.hpp"
+
+#include <atomic>
 
 #include <csignal>
-
-#include <thread>
 
 using namespace std;
 using namespace chrono;
@@ -32,7 +33,7 @@ int main()
 	const auto core = Core::Create();
 	core.Start();
 
-	for (;; this_thread::sleep_for(500ms))
+	for (;; SleepWrapper::Sleep(500ms))
 		if (!run) [[unlikely]]
 			break;
 

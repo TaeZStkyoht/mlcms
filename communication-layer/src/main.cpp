@@ -1,6 +1,7 @@
 #include "Core.hpp"
 
 #include "middleware/Logger.hpp"
+#include "middleware/SleepWrapper.hpp"
 
 #include <csignal>
 
@@ -30,7 +31,7 @@ int main(int argc, const char* argv[])
 	const auto core = Core::Create({argv, argv + argc});
 	core.Start();
 
-	for (;; this_thread::sleep_for(500ms))
+	for (;; SleepWrapper::Sleep(500ms))
 		if (!run) [[unlikely]]
 			break;
 

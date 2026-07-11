@@ -6,6 +6,7 @@ link_libraries(
 	GTest::gtest
 	GTest::gtest_main
 	FakeLogger
+	MockSleepWrapper
 )
 
 add_executable(${PROJECT_NAME}-unit_test_Core unit_test_Core.cpp
@@ -16,4 +17,13 @@ add_executable(${PROJECT_NAME}-unit_test_Core unit_test_Core.cpp
 add_executable(${PROJECT_NAME}-unit_test_main unit_test_main.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-MockCore>
 	$<TARGET_OBJECTS:${PROJECT_NAME}-MockGrpcClient>
+)
+
+add_executable(${PROJECT_NAME}-unit_test_GrpcClient unit_test_GrpcClient.cpp
+	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcClient>
+	$<TARGET_OBJECTS:BaseGrpcServer>
+	$<TARGET_OBJECTS:communication-layer-proto>
+)
+target_link_libraries(${PROJECT_NAME}-unit_test_GrpcClient
+	gRPC::grpc++_unsecure
 )
