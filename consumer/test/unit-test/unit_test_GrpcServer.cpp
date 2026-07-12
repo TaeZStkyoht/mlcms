@@ -8,6 +8,8 @@
 
 using namespace std;
 
+using namespace testing;
+
 using namespace google::protobuf;
 
 using namespace middleware;
@@ -23,19 +25,23 @@ public:
 	}
 };
 
-static const string url = "127.0.0.1:50051";
+class GrpcServerFixture : public Test {
+protected:
+	GrpcServer grpcServer{url};
+	GrpcClient grpcClient{url};
 
-TEST(GrpcServer, GrpcServerIsNotStarted)
+private:
+	inline static const string url = "127.0.0.1:50051";
+};
+
+TEST_F(GrpcServerFixture, GrpcServerIsNotStarted)
 {
-	GrpcClient grpcClient(url);
 	EXPECT_FALSE(grpcClient.SendMessage());
 }
 
-TEST(GrpcServer, GrpcServerIsStarted)
+TEST_F(GrpcServerFixture, GrpcServerIsStarted)
 {
-	GrpcServer grpcServer(url);
 	grpcServer.Start();
 
-	GrpcClient grpcClient(url);
 	EXPECT_TRUE(grpcClient.SendMessage());
 }
