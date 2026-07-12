@@ -6,5 +6,5 @@ class MessageRequestObserver {
 public:
 	virtual ~MessageRequestObserver() = default;
 
-	virtual QueueSize Size() const = 0;
+	virtual entity::QueueSize Size() const = 0;
 };

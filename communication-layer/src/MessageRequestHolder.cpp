@@ -4,6 +4,8 @@
 
 using namespace std;
 
+using namespace entity;
+
 using namespace middleware;
 
 using enum Logger::Level;

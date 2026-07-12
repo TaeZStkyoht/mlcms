@@ -6,5 +6,5 @@
 
 class MockMessageRequestObserver final : public MessageRequestObserver {
 public:
-	MOCK_METHOD(QueueSize, Size, (), (const, override));
+	MOCK_METHOD(entity::QueueSize, Size, (), (const, override));
 };

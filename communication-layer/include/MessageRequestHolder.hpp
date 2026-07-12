@@ -17,7 +17,7 @@ public:
 	}
 
 private:
-	QueueSize Size() const override;
+	entity::QueueSize Size() const override;
 	void Push(entity::MessageRequest messageRequest) override;
 	std::optional<entity::MessageRequest> Pull() override;
 

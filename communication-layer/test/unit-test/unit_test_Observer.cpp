@@ -9,6 +9,8 @@ using namespace std;
 
 using namespace testing;
 
+using namespace entity;
+
 using namespace middleware;
 
 using enum Logger::Level;

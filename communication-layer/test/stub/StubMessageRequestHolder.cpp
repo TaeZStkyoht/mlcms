@@ -2,12 +2,14 @@
 
 using namespace std;
 
+using namespace entity;
+
 QueueSize MessageRequestHolder::Size() const
 {
 	return {};
 }
 
-void MessageRequestHolder::Push(entity::MessageRequest)
+void MessageRequestHolder::Push(MessageRequest)
 {
 }
 
