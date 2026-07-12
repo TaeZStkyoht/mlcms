@@ -1,0 +1,5 @@
+add_library(${PROJECT_NAME}-MockObserver OBJECT MockObserver.cpp)
+add_library(${PROJECT_NAME}-MockGrpcClient OBJECT MockGrpcClient.cpp)
+add_library(${PROJECT_NAME}-MockMessageRequestSender OBJECT MockMessageRequestSender.cpp)
+add_library(${PROJECT_NAME}-MockGrpcServer OBJECT MockGrpcServer.cpp)
+add_library(${PROJECT_NAME}-MockCore OBJECT MockCore.cpp)

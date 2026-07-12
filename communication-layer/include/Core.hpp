@@ -4,8 +4,6 @@
 #include "MessageRequestSender.hpp"
 #include "Observer.hpp"
 
-#include <atomic>
-
 class Core final {
 public:
 	static Core Create(std::span<const char* const> arguments);
