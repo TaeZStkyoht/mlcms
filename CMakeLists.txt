@@ -37,6 +37,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wconversion \
 					-Wduplicated-cond \
 					-Wnull-dereference \
 					-Wno-unknown-pragmas \
+					-fno-exceptions \
 ")
 
 if(PLATFORM MATCHES "x86")
