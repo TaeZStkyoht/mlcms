@@ -21,3 +21,10 @@ add_executable(${PROJECT_NAME}-unit_test_Core unit_test_Core.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-StubMessageRequestHolder>
 	$<TARGET_OBJECTS:${PROJECT_NAME}-MockObserver>
 )
+
+add_executable(${PROJECT_NAME}-unit_test_Observer unit_test_Observer.cpp
+	$<TARGET_OBJECTS:${PROJECT_NAME}-Observer>
+)
+target_link_libraries(${PROJECT_NAME}-unit_test_Observer
+	gmock
+)

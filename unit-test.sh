@@ -20,16 +20,16 @@ cd "$TEST_DIR" || {
     exit 1
 }
 
-TEST_FILE_PREFIX="unit_test_"
+TEST_FILE_PREFIX="*unit_test_*"
 
 # Check if there are any files starting with the prefix
-if ! ls ${TEST_FILE_PREFIX}* 1> /dev/null 2>&1; then
-    echo "No test files found starting with '${TEST_FILE_PREFIX}'. Exiting."
+if ! ls ${TEST_FILE_PREFIX} 1> /dev/null 2>&1; then
+    echo "No test file found with search '${TEST_FILE_PREFIX}'. Exiting."
     exit 1
 fi
 
 # Run tests
-for file in ${TEST_FILE_PREFIX}*;
+for file in ${TEST_FILE_PREFIX};
 do
     if [ -x "$file" ]; then
         ./${file}
