@@ -52,3 +52,12 @@ target_link_libraries(${PROJECT_NAME}-unit_test_GrpcClient
 add_executable(${PROJECT_NAME}-unit_test_MessageRequestHolder unit_test_MessageRequestHolder.cpp
 	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestHolder>
 )
+
+add_executable(${PROJECT_NAME}-unit_test_MessageRequestSender unit_test_MessageRequestSender.cpp
+	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestSender>
+	$<TARGET_OBJECTS:${PROJECT_NAME}-MockGrpcClient>
+)
+target_link_libraries(${PROJECT_NAME}-unit_test_MessageRequestSender
+	gRPC::grpc++_unsecure
+	gmock
+)
