@@ -29,7 +29,7 @@ private:
 	inline static const string url = "127.0.0.1:50051";
 };
 
-TEST_F(MessageRequestSenderFixture, Some)
+TEST_F(MessageRequestSenderFixture, ProcessQueues)
 {
 	EXPECT_CALL(*messageRequestPuller, Pull()).WillRepeatedly([] -> entity::MessageRequest {
 		this_thread::sleep_for(1ms);
@@ -57,12 +57,12 @@ TEST_F(MessageRequestSenderFixture, Some)
 
 	messageRequestSender->Start();
 
-	this_thread::sleep_for(5s);
+	this_thread::sleep_for(3s);
 
 	// Then with available clients
 	MockGrpcClient::callbackSendMessage = [&mockGrpcClientCallbackSendMessageCalled](const string&, system_clock::time_point) noexcept {
 		mockGrpcClientCallbackSendMessageCalled = true;
-		MockGrpcClient::callbackLastTriedTime = [] { return steady_clock::now(); };
+		MockGrpcClient::callbackLastTriedTime = [] noexcept { return steady_clock::now(); };
 		return true;
 	};
 
@@ -76,7 +76,7 @@ TEST_F(MessageRequestSenderFixture, Some)
 		return 58;
 	};
 
-	this_thread::sleep_for(5s);
+	this_thread::sleep_for(3s);
 
 	run = false;
 	messageRequestSender.reset();

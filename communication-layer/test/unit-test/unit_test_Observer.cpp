@@ -28,7 +28,7 @@ private:
 	}
 };
 
-TEST_F(ObserverFixture, Some)
+TEST_F(ObserverFixture, ObserverMetrics)
 {
 	EXPECT_CALL(*messageRequestObserver, Size()).WillRepeatedly(Return(QueueSize()));
 	EXPECT_CALL(*availabilityProvider, IsAvailable()).WillRepeatedly(Return(true));

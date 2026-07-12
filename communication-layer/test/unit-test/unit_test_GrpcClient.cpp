@@ -23,8 +23,9 @@ public:
 	}
 
 private:
-	Status SendMessage(ServerContext*, const cl::OuterMessageRequest*, Empty*)
+	Status SendMessage(ServerContext*, const cl::OuterMessageRequest*, Empty*) override
 	{
+		this_thread::sleep_for(1ms);
 		return Status::OK;
 	}
 };

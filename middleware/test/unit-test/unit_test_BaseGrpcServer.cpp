@@ -16,8 +16,8 @@ using namespace middleware;
 
 using enum Logger::Level;
 
-struct SomeService final : public Temp::Service, public BaseGrpcServer {
-	explicit SomeService(string address) noexcept : BaseGrpcServer(this, move(address))
+struct TempServer final : public Temp::Service, public BaseGrpcServer {
+	explicit TempServer(string address) noexcept : BaseGrpcServer(this, move(address))
 	{
 	}
 };
@@ -37,8 +37,8 @@ TEST_F(BaseGrpcServerFixture, Start)
 {
 	{
 		const string address = "127.0.0.1:50000";
-		SomeService someService(address);
-		ignore = someService.Start();
+		TempServer tempServer(address);
+		ignore = tempServer.Start();
 		EXPECT_TRUE(FakeLogger::CheckLastLog(logCategory, INFO, "Connect to " + address));
 		this_thread::sleep_for(100ms);
 	}

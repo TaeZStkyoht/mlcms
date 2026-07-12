@@ -130,7 +130,7 @@ TEST_F(LoggerFixture, LogEventWithALERT)
 
 TEST_F(LoggerFixture, GetLoggerByCategoryCategoryExists)
 {
-	const string name = "someName";
+	const string name = "cat1";
 	FakeLog4cpp::callbackCategoryExists = [&name]() noexcept -> const string& { return name; };
 
 	const Logger logger = Logger::GetLoggerByCategory({});
@@ -151,7 +151,7 @@ TEST_F(LoggerFixture, SetLogLevel)
 
 TEST_F(LoggerFixture, EnableFileLogging)
 {
-	const string fileName = "someFileName";
+	const string fileName = "file1";
 	Logger::EnableFileLogging(fileName);
 	FileAppender* appender;
 	ASSERT_NO_FATAL_FAILURE({ checkAppender("FileAppender", "%d %-7p(%t) %-9c: %m%n", appender); });
@@ -167,7 +167,7 @@ TEST_F(LoggerFixture, EnableStdoutLogging)
 
 TEST_F(LoggerFixture, EnableSysLogLogging)
 {
-	const string syslogName = "someSyslogName";
+	const string syslogName = "mlcms";
 	Logger::EnableSysLogLogging(syslogName);
 	SyslogAppender* appender;
 	ASSERT_NO_FATAL_FAILURE({ checkAppender("SysLog", "%-7p (%t) %-9c: %m%n", appender); });
@@ -179,8 +179,8 @@ TEST_F(LoggerFixture, LogStream)
 	const Logger logger = Logger::GetLoggerByCategory({});
 	const auto logStream = logger << Logger::Level::DEBUG;
 
-	constexpr string_view str1 = "something";
-	constexpr string_view str2 = " and also";
+	constexpr string_view str1 = "word1";
+	constexpr string_view str2 = " word2";
 	logStream << str1;
 	logStream << str2;
 

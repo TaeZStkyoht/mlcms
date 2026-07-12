@@ -47,6 +47,14 @@ TEST_F(MessageRequestHolderFixture, FillAndEmptyQueue)
 	messageRequestPusher.Push(CreateMessageRequest(CRITICAL));
 
 	{
+		const auto queueSize = messageRequestObserver.Size();
+		EXPECT_EQ(queueSize.critical, 1);
+		EXPECT_EQ(queueSize.high, 1);
+		EXPECT_EQ(queueSize.normal, 1);
+		EXPECT_EQ(queueSize.low, 2);
+	}
+
+	{
 		const auto messageRequest = messageRequestPuller.Pull();
 		ASSERT_TRUE(messageRequest);
 		EXPECT_EQ(messageRequest->priority, CRITICAL);
@@ -74,6 +82,14 @@ TEST_F(MessageRequestHolderFixture, FillAndEmptyQueue)
 		const auto messageRequest = messageRequestPuller.Pull();
 		ASSERT_TRUE(messageRequest);
 		EXPECT_EQ(messageRequest->priority, LOW);
+	}
+
+	{
+		const auto queueSize = messageRequestObserver.Size();
+		EXPECT_EQ(queueSize.critical, 0);
+		EXPECT_EQ(queueSize.high, 0);
+		EXPECT_EQ(queueSize.normal, 0);
+		EXPECT_EQ(queueSize.low, 0);
 	}
 
 	EXPECT_FALSE(messageRequestPuller.Pull());
