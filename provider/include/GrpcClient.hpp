@@ -8,7 +8,7 @@ public:
 	[[nodiscard]] explicit GrpcClient(std::string uri);
 	~GrpcClient();
 
-	void Start();
+	void Start() const;
 
 private:
 	class Impl;

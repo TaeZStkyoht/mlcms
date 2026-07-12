@@ -18,7 +18,7 @@ public:
 	void Start();
 
 private:
-	void Work();
+	void Work() const;
 
 	std::shared_ptr<MessageRequestObserver> _messageRequestObserver;
 	std::vector<std::shared_ptr<AvailabilityProvider>> _availabilityProvider;

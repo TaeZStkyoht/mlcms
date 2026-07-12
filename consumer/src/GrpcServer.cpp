@@ -20,7 +20,7 @@ public:
 	}
 
 private:
-	Status SendMessage(ServerContext*, const cl::OuterMessageRequest*, Empty*)
+	Status SendMessage(ServerContext*, const cl::OuterMessageRequest*, Empty*) override
 	{
 		return Status::OK;
 	}

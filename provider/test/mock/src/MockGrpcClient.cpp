@@ -14,7 +14,7 @@ GrpcClient::GrpcClient(string)
 
 GrpcClient::~GrpcClient() = default;
 
-void GrpcClient::Start()
+void GrpcClient::Start() const
 {
 	if (callbackStart)
 		callbackStart();

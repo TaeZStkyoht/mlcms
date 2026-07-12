@@ -18,7 +18,7 @@ class GrpcClient final : public BaseGrpcClient<cl::Consumer> {
 public:
 	using BaseGrpcClient::BaseGrpcClient;
 
-	bool SendMessage()
+	bool SendMessage() const
 	{
 		ResponseWithClientContext<Empty> clientContextWithReponse;
 		return _stub->SendMessage(&clientContextWithReponse.cc, {}, &clientContextWithReponse.response).ok();

@@ -61,7 +61,7 @@ GrpcClient::GrpcClient(std::string uri) : _impl(make_unique<Impl>(move(uri)))
 
 GrpcClient::~GrpcClient() = default;
 
-void GrpcClient::Start()
+void GrpcClient::Start() const
 {
 	_impl->Start();
 }

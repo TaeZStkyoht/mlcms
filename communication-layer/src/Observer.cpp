@@ -16,7 +16,7 @@ void Observer::Start()
 	_worker = jthread([this] { Work(); });
 }
 
-void Observer::Work()
+void Observer::Work() const
 {
 	for (; !_worker.get_stop_token().stop_requested(); SleepWrapper::Sleep(1s)) {
 		const auto queueSize = _messageRequestObserver->Size();

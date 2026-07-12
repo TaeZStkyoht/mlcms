@@ -12,7 +12,7 @@ atomic_bool run;
 
 class CoreFixture : public Test {
 private:
-	void SetUp() final
+	void SetUp() noexcept final
 	{
 		run = true;
 
