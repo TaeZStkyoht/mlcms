@@ -28,3 +28,13 @@ add_executable(${PROJECT_NAME}-unit_test_Observer unit_test_Observer.cpp
 target_link_libraries(${PROJECT_NAME}-unit_test_Observer
 	gmock
 )
+
+add_executable(${PROJECT_NAME}-unit_test_GrpcServer unit_test_GrpcServer.cpp
+	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcServer>
+	$<TARGET_OBJECTS:communication-layer-proto>
+)
+target_link_libraries(${PROJECT_NAME}-unit_test_GrpcServer
+	BaseGrpcServer
+	gRPC::grpc++_unsecure
+	gmock
+)
