@@ -38,3 +38,13 @@ target_link_libraries(${PROJECT_NAME}-unit_test_GrpcServer
 	gRPC::grpc++_unsecure
 	gmock
 )
+
+add_executable(${PROJECT_NAME}-unit_test_GrpcClient unit_test_GrpcClient.cpp
+	$<TARGET_OBJECTS:${PROJECT_NAME}-GrpcClient>
+	$<TARGET_OBJECTS:consumer-proto>
+)
+target_link_libraries(${PROJECT_NAME}-unit_test_GrpcClient
+	BaseGrpcServer
+	FakeLogger
+	gRPC::grpc++_unsecure
+)
