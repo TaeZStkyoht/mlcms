@@ -27,6 +27,7 @@ void MessageRequestHolder::Push(entity::MessageRequest messageRequest)
 		using enum entity::MessageRequest::Priority;
 	[[unlikely]] default:
 		logger << WARN << "Unexpected priority has come. Set to LOW. Original value: " << static_cast<uint16_t>(messageRequest.priority);
+		messageRequest.priority = LOW;
 		[[fallthrough]];
 	case LOW:
 		_messageRequestsLow.push(move(messageRequest));

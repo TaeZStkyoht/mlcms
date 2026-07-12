@@ -48,3 +48,7 @@ target_link_libraries(${PROJECT_NAME}-unit_test_GrpcClient
 	FakeLogger
 	gRPC::grpc++_unsecure
 )
+
+add_executable(${PROJECT_NAME}-unit_test_MessageRequestHolder unit_test_MessageRequestHolder.cpp
+	$<TARGET_OBJECTS:${PROJECT_NAME}-MessageRequestHolder>
+)
